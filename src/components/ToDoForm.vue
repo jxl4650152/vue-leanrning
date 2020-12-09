@@ -10,7 +10,7 @@
       autocomplete="off"
       v-model.trim.lazy="label"
     />
-    <button type="submit">
+    <button type="submit" class="btn btn__primary btn__lg">
       Add
     </button>
   </form>
