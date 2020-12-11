@@ -2,9 +2,14 @@
   <div>
     <h1>To-Do List</h1>
     <to-do-form @todo-added.self="addToDo"></to-do-form>
-    <ul>
+    <h2 id="list-summary" ref="listSummary" tabindex="-1" >{{listSummary}}</h2>
+    <ul aria-labelledby="list-summary" class="stack-large">
       <li v-for="item in ToDoItems" :key="item.id">
-        <to-do-item :id="item.id" :label="item.label" :done="item.done"></to-do-item>
+        <to-do-item :id="item.id" :label="item.label" :done="item.done" 
+                    @checkbox-changed="updateDoneStatus(item.id)"
+                    @item-deleted="deleteToDo(item.id)"
+                    @item-edited="editToDo(item.id, $event)">
+        </to-do-item>
       </li>
     </ul>
   </div>
@@ -35,8 +40,27 @@ export default {
   methods: {
     addToDo(toDoLabel){
       this.ToDoItems.push({id:uniqueId('todo-'), label: toDoLabel, done: false})
+    },
+    updateDoneStatus(toDoId) {
+      const toDoToUpdate = this.ToDoItems.find(item => item.id === toDoId)
+      toDoToUpdate.done = !toDoToUpdate.done
+    },
+    deleteToDo(toDoId) {
+      const itemIndex = this.ToDoItems.findIndex(item => item.id === toDoId);
+      this.ToDoItems.splice(itemIndex, 1);
+      this.$refs.listSummary.focus();
+    },
+    editToDo(toDoId, newLabel) {
+      const toDoToEdit = this.ToDoItems.find(item => item.id === toDoId);
+      toDoToEdit.label = newLabel;
     }
   },
+  computed: {
+    listSummary() {
+      const numberFinishedItems = this.ToDoItems.filter(item =>item.done).length
+      return `${numberFinishedItems} out of ${this.ToDoItems.length} items completed`
+    }
+  }
 }
 </script>
 
